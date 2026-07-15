@@ -5,7 +5,6 @@ on:
 
 jobs:
   sync:
-    # Ersetze die '12' mit deiner Issue-Nummer!
     if: github.event.issue.number == 3
     runs-on: ubuntu-latest
     permissions:
@@ -18,28 +17,46 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh issue view ${{ github.event.issue.number }} --json body --jq .body > issue_body.md
+          gh issue view 3 --json body --jq .body > issue_body.md
 
       - name: Update README
         run: |
           python -c "
-          with open('README.md', 'r') as f:
+          import os
+
+          # 1. README einlesen
+          if not os.path.exists('README.md'):
+              print('Fehler: README.md existiert nicht!')
+              exit(1)
+
+          with open('README.md', 'r', encoding='utf-8') as f:
               readme = f.read()
-          with open('issue_body.md', 'r') as f:
+
+          # 2. Inhalt aus dem Issue einlesen
+          if not os.path.exists('issue_body.md'):
+              print('Fehler: issue_body.md wurde nicht erstellt!')
+              exit(1)
+
+          with open('issue_body.md', 'r', encoding='utf-8') as f:
               body = f.read()
-          
-          start_tag = ''
-          end_tag = ''
-          
+
+          # 3. Platzhalter-Tags definieren
+          start_tag = '<!-- ROADMAP:START -->'
+          end_tag = '<!-- ROADMAP:END -->'
+
+          # 4. README aktualisieren
           if start_tag in readme and end_tag in readme:
-              parts = readme.split(start_tag)
-              head = parts[0]
-              tail = parts[1].split(end_tag)[1]
-              new_readme = f'{head}{start_tag}\n\n{body}\n\n{end_tag}{tail}'
-              with open('README.md', 'w') as f:
+              head = readme.split(start_tag)[0]
+              tail = readme.split(end_tag)[1]
+              
+              new_readme = head + start_tag + '\n\n' + body + '\n\n' + end_tag + tail
+              
+              with open('README.md', 'w', encoding='utf-8') as f:
                   f.write(new_readme)
+              print('README erfolgreich mit Issue #3 synchronisiert!')
           else:
-              print('Fehler: Platzhalter-Tags wurden in der README nicht gefunden!')
+              print('Fehler: Die HTML-Kommentare <!-- ROADMAP:START --> und <!-- ROADMAP:END --> fehlen in der README.md!')
+              exit(1)
           "
 
       - name: Commit and Push
@@ -47,5 +64,5 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add README.md
-          git commit -m 'docs: sync roadmap from issue #${{ github.event.issue.number }}' || exit 0
+          git commit -m 'docs: sync roadmap from issue #3' || exit 0
           git push
