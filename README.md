@@ -11,7 +11,7 @@ This is a Project to fully rewrite and redesign the KZU Trade Website.
 
 
 ## Roadmap
-<!-- ROADMAP:START -->$
+<!-- ROADMAP:START -->
 
 <!-- ROADMAP:END -->
 
