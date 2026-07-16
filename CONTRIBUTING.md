@@ -1,4 +1,4 @@
-# Contributing Giudelins
+# Contributing Giudelines
 We are very open to Contributions, but there are a few Rules.
 - We only accept Contributions over Pull Requests
 - We only accept contributions that add a new Feature that fit into the already existing Website or Roadmap (If you want to suggest smth completely new, please tell us about it in the Discussions) or Fix an existing Bug.
